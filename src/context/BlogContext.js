@@ -1,12 +1,17 @@
 
 import createDataContext from './createDataContext';
-import CreateScreen from '../screens/CreateScreen';
+
 
 
 const blogReduecer = (state, action) => {
    switch(action.type){
        case'delete_blogpost':
              return state.filter((blogPost) => blogPost.id !== action.payload)
+
+       case'edit_blogpost':
+             return state.map((blogPost)=>{
+                 return blogPost.id === action.payload.id ? action.payload : blogPost       
+             })
        case'add_blogpost':
              return [...state, {id: Math.floor(Math.random() * 99999), 
                                 title: action.payload.title,
@@ -19,7 +24,9 @@ const blogReduecer = (state, action) => {
 const addBlogPost = (dispatch) => {
     return (title, content, callback) => { 
         dispatch({ type:'add_blogpost', payload:{title, content} })
+        if(callback){
           callback()
+        }
     }  
 }
 
@@ -29,4 +36,14 @@ const deleteBlogPost = (dispatch) => {
     }
 }
 
-export const {Context, Provider} = createDataContext(blogReduecer, {addBlogPost, deleteBlogPost}, [])
+const editBlogPost = (dispatch) => {
+    return (id, title, content, callback) => {
+      dispatch ( {type:'edit_blogpost', payload: {id, title, content}})
+      if(callback){
+        callback()
+      }
+    }
+}
+
+export const {Context, Provider} = createDataContext(blogReduecer, {addBlogPost, deleteBlogPost, editBlogPost}, 
+    [{title: 'TEST POST', content: 'TEST CONTENT', id: "1" }])
